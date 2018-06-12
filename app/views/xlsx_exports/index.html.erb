@@ -1,0 +1,44 @@
+<div class='contextual'>
+  <%= link_to 'New', new_xlsx_export_path, :class => 'icon icon-xe-new' %>
+</div>
+
+<%= title 'XLSX Export' %>
+
+<% if @exports.any? %>
+  <table class='list table-striped table-sm table-responsive table-bordered'>
+    <thead class='thead-default'>
+      <tr>
+        <% XlsxExport.columns.each do |column| %>
+          <th class='text-center'>
+            <div>
+              <%= column.name == 'id' ? '#' : column.name.humanize %>
+            </div>
+          </th>
+        <% end %>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @exports.each do |export| %>
+        <tr>
+          <% XlsxExport.columns.each do |column| %>
+            <td class="name">
+              <% if column.name == 'author_id' %>
+                <%= user_link(export[column.name.to_sym]) %>
+              <% else %>
+                <%= format_object(export[column.name.to_sym]) %>
+              <% end %>
+            </td>
+          <% end %>
+          <td><%= link_to '', edit_xlsx_export_path(export.id), :class => 'icon icon-xe-edit', title: 'Edit', rel: 'tooltip' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if MY_FEATURE[:gem_axlsx] %>
+  <% other_formats_links do |f| %>
+    <%= link_to 'XLSX', xlsx_exports_path(format: 'xlsx'), :class => 'icon icon-xe-export' %>
+  <% end %>
+<% end %>

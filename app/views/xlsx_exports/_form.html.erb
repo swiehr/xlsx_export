@@ -1,0 +1,33 @@
+<%= error_messages_for 'xlsx_export' %>
+
+<%
+  if @export.new_record?
+    post_url = xlsx_exports_path(@export)
+  else
+    post_url = xlsx_export_path(@export)
+  end
+  exclusions = %w[id author_id created_on updated_on]
+%>
+
+<%= form_for @export, :url => post_url do |f| %>
+  <%= back_url_hidden_field_tag %>
+  <% XlsxExport.columns.each do |column| %>
+    <% next if exclusions.include?(column.name) %>
+    <div class="form-group row auxtable-row">
+      <%= f.label '', column.name.humanize, class: 'col-2 col-form-label' %>
+      <div class='col-10'>
+        <% if column.type.to_s == 'boolean' %>
+          <%= f.select column.name.to_sym, {format_object(true) => true, format_object(false) => false }, {}, class: 'form-control form-control-sm' %>
+        <% elsif column.type.to_s == 'integer' %>
+          <%= f.number_field column.name.to_sym, class: 'form-control form-control-sm' %>
+        <% elsif column.type.to_s == 'string' %>
+          <%= f.text_field column.name.to_sym, class: 'form-control form-control-sm' %>
+        <% elsif column.type.to_s == 'text' %>
+          <%= f.text_area column.name.to_sym, class: 'form-control form-control-sm' %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <%= f.submit 'Submit', class: 'btn btn-primary' %>
+  <%= link_to 'Cancel', :back, class: 'btn btn-default' %>
+<% end %>
